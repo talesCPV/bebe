@@ -1,0 +1,108 @@
+<title>AVISOS</title>
+<template>
+    <style>
+        .frm-avisos{
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 10px;
+        }
+
+        .div-warning{
+            cursor: pointer;
+            display: flex;
+            gap: 10px;
+        }
+
+        .div-warning:hover{
+
+            background-color: black;
+            color: white
+
+        }
+
+        .no-warning{
+            width: 100%;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 800;
+        }
+
+    </style>
+
+    <div class="frm-avisos">
+
+    </div>
+
+
+</template>
+<script>
+    
+    fillWarning()
+
+    function fillWarning(){
+        const params = new Object;
+            params.id = localStorage.getItem('idUser')
+        
+        const myPromisse = queryDB(params,18);
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            const avisos = document.querySelector('.frm-avisos')
+
+            if(json.length == 0){
+                const container =  document.createElement('div')
+                container.className = 'no-warning'
+                container.innerHTML =   "NÃO HÁ NOVOS AVISOS"
+                avisos.appendChild(container)
+            }else{
+                for(let i=0; i<json.length; i++){
+                    const call = JSON.parse(json[i].callback)
+                    const container =  document.createElement('div')
+                    container.className = 'div-warning' 
+                    switch(call.origem){
+                            case 'agenda':
+                                container.innerHTML = `<span class="mdi mdi-volleyball"></span> Treino - ${call.nome}, ${call.data.showDate()} as ${call.data.showTime()}hs, ${call.local}`
+                                container.addEventListener('click',()=>{                    
+                                    markWarning(json[i].id)
+                                    openHTML('viewAgenda.html','modal',call)
+                                })
+                            break
+                            case 'mail':
+                                container.innerHTML = '<span class="mdi mdi-email"></span> '+ json[i].message
+                                container.addEventListener('click',()=>{                    
+                                    markWarning(json[i].id)
+                                    openHTML('mail.html','modal',call)
+                                })
+
+                            break
+                            default:
+                                container.innerHTML = 'AInda Não Implementado'
+                                container.addEventListener('click',()=>{                    
+                                    alert('não implementado ainda')
+                                })                                
+
+                        }
+
+                    avisos.appendChild(container)
+                }
+            }
+        })
+    }
+
+
+    function markWarning(id){
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.id = id
+            const myPromisse = queryDB(params,19);
+            myPromisse.then((resolve)=>{
+                console.log(resolve)
+                mainData.dashboard.func.fillPerfil()
+            })
+
+
+    }
+
+
+ 
+</script>

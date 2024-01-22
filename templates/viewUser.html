@@ -1,0 +1,101 @@
+<title>
+    
+</title>
+<template>
+    <style>
+        
+        input[type="email"], input[type="password"], input[type="text"]{
+            width: 95%;
+            height: 30px;
+        }
+
+        .frm-user{
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .top-perfil{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .top-perfil * {
+            width: 50%;
+        }
+
+        @media (max-width: 769px) {
+
+        }
+
+    </style>
+
+    <div class="frm-user">
+        
+        <div class="data-perfil">
+
+            <div class="top-perfil">
+                <input id="edtMail" type="email" maxlength="70" inputmode="email" placeholder="* Email" onkeyup="validate(this)" >
+                <input id="edtNick" type="text" maxlength="15" placeholder="* Nick" onkeyup="valNoSpace(this)">
+                <input id="edtPass" type="password" maxlength="12" placeholder="* Senha" onkeyup="valNoSpace(this)">
+                <input id="edtRePass" type="password" maxlength="12" placeholder="* Repita a Senha" onkeyup="valNoSpace(this)">
+                <button id="btnSave" class="btn btn-primary">Save</button>                
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+</template>
+<script>
+
+    document.querySelector('.title-viewUser').innerHTML = localStorage.getItem('email')
+    document.querySelector('#edtMail').value = localStorage.getItem('email')
+    document.querySelector('#edtNick').value = localStorage.getItem('nick')
+
+    document.querySelector('#btnSave').addEventListener('click',()=>{
+        const pass = document.querySelector('#edtPass').value.trim()
+        const repass = document.querySelector('#edtRePass').value.trim()
+        const nick = document.querySelector('#edtNick').value.trim()
+
+        if(checkMail('#edtMail')){
+            if(pass == repass){
+                if(goon('edtPass,edtMail')){
+                    const email = document.querySelector('#edtMail').value.trim().toLowerCase()
+                    const params = new Object;
+                        params.id = localStorage.getItem('idUser')
+                        params.email = email
+                        params.hash = (email+pass).getHash(77)
+                        params.nick = nick
+                        params.cod_local  = mainData.viewUser.data.cod_local
+                        params.cod_regiao = mainData.viewUser.data.cod_regiao
+
+                    const myPromisse = queryDB(params,1);
+                    myPromisse.then((resolve)=>{
+                        alert('Usuário e senha foram salvos com sucesso!')
+                        localStorage.setItem('email',params.email)
+                        localStorage.setItem('hash',params.hash)
+                        localStorage.setItem('nick',params.nick)
+                        localStorage.setItem('cod_local',params.cod_local)
+                        localStorage.setItem('cod_regiao',params.cod_regiao)
+                        closeModal('0')
+                    })
+                }
+            }else{
+                alert('As senhas não conferem.')
+                document.querySelector('#edtRePass').focus()
+            }
+        }
+    })
+
+
+</script>

@@ -1,0 +1,52 @@
+<title>Nova Modalidade</title>
+<template>
+    <style>
+
+        .center{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 250px;
+        }
+
+        .center input, .center button{
+            width: 250px;
+        }
+
+        .center p{
+            font-size: 0.5em;
+        }
+
+    </style>
+
+    <div class="center">
+        <input id="edtNomeModal" type="text" placeholder="Nome da Modalidade">
+        <button id="btnNewModal" class="btn btn-primary">Criar</button>
+
+        <p>*Uma vez criada, a modalidade não pode ser excluída nem renomeada.</p>
+
+    </div>
+
+
+</template>
+<script>
+    document.querySelector('#btnNewModal').addEventListener('click',()=>{
+        const modal = document.querySelector('#edtNomeModal').value.trim().toUpperCase()
+        if(confirm(`Confirma a adição da modalidade ${modal}?\r\r*Uma vez criada não pode ser mais editada ou removida!`)){
+            const params = new Object;
+                params.hash = localStorage.getItem('hash')
+                params.modal = modal
+
+            const myPromisse = queryDB(params,6);
+            myPromisse.then((resolve)=>{
+                console.log(resolve)
+                mainData.func.fillModal('#txtModal',localStorage.getItem('hash'))                
+                closeModal('1')
+            })
+        }
+    })
+ 
+</script>

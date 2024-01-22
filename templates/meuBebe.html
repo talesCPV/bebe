@@ -1,0 +1,209 @@
+<title></title>
+<template>
+    <style>
+
+        .frm-bebe{
+            display: flex;
+            flex-direction: column;
+            align-items: center;            
+            height: 100vh;
+        }
+
+        .img-perfil{
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            align-items: center;
+            gap: 10px;
+            padding: 5px;
+            width: 40%;
+        }
+
+        .img-perfil *, .data-perfil *{
+            width: 95%;
+        }
+
+        .formulario{
+            width: 100%;
+        }
+
+        .formulario label{
+            width: 20% !important;
+        }
+
+
+        #cnvImg{
+            border-radius: 10% !important;
+            cursor: pointer;
+        }
+
+        #cnvImg:hover{
+            border: 1px solid red;
+        }
+
+        #up_file{
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 769px) {
+
+            .data-perfil, .img-perfil{
+                width: 100%;                
+            }
+
+            .formulario label{
+               font-size: 0.9em;
+            }
+
+        }
+
+    </style>
+
+    <div class="frm-bebe">
+
+        <div class="img-perfil">
+            <canvas width="300" height="300" id="cnvImg"></canvas>
+            <input  name="up_file" id="up_file" type="file" accept=".jpg,.jpeg">
+        </div>
+
+        <select id="cmbBebe">
+            <option value="0">Novo Bebê</option>
+        </select>
+
+        <fieldset>
+            <legend>Dados do Bebê</legend>
+            <div class="line formulario">
+                <label for="edtNome">Nome</label>
+                <input id="edtNome" type="text">    
+            </div>
+
+            <div class="line formulario">
+                <label for="edtBorn">Nasc.</label>
+                <input id="edtBorn" type="date">    
+            </div>
+
+            <div class="line formulario">
+                <label for="">Sexo</label>
+                <div class="radio">
+                  <input type="radio" id="masc" name="sex" value="1" checked />
+                  <label for="masc">Masculino</label>
+                </div>
+              
+                <div class="radio">
+                  <input type="radio" id="fem" name="sex" value="0" />
+                  <label for="fem">Feminino</label>
+                </div>
+            </div>
+            <button id="btnNewBebe">Salvar</button>
+        </fieldset>
+              
+
+
+        </fieldset>
+
+
+
+    </div>
+
+
+</template>
+<script>
+
+    function uploadImg(index){                
+        const file = localStorage.getItem('idUser')+'-'+index+'.jpg'
+        uploadImage('up_file','/../assets/bebes/',file)
+        .then(()=>{                   
+            document.querySelector('#imgUser').src = `assets/bebes/${file}?${new Date().getTime()}`
+            document.querySelector('#pic-perfil').src = `assets/bebes/${file}?${new Date().getTime()}`            
+        })
+        
+    }
+
+    function viewBebe(){
+        const params = new Object
+            params.hash = localStorage.getItem('hash')
+
+        const myPromisse = queryDB(params,5)
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            const cmb = document.querySelector('#cmbBebe')
+            cmb.innerHTML = ' <option value="0" selected>Novo Bebê</option>'
+            for(let i=0; i<json.length; i++){
+                const opt = document.createElement('option')
+                opt.value = json[i].id
+                opt.innerHTML = json[i].nome
+                opt.born = json[i].born
+                opt.sexo = json[i].sexo
+                cmb.appendChild(opt)
+            }
+
+            console.log(resolve)
+        })
+    }
+
+    document.querySelector('#btnNewBebe').addEventListener('click',()=>{
+        const params = new Object;
+            params.hash =  localStorage.getItem('hash')
+            params.id_bebe = document.querySelector('#cmbBebe').value
+            params.nome = document.querySelector('#edtNome').value.trim().toUpperCase()
+            params.born = document.querySelector('#edtBorn').value
+            params.sexo = document.querySelector('[name="sex"]:checked').value
+
+            const myPromisse = queryDB(params,4)
+                    myPromisse.then((resolve)=>{
+                        mainData.perfil.func.viewBebe()
+                        closeModal('0')
+                    })
+
+
+    })
+
+    document.querySelector('#up_file').addEventListener('change',()=>{
+        const index = parseInt(document.querySelector('#cmbBebe').value)
+        if(index>0){
+            showFile('#up_file','#cnvImg')
+            uploadImg(index)
+        }else{
+            alert('Selecione um Bebê abaixo.')
+        }
+    })
+
+    document.querySelector('#cmbBebe').addEventListener('change',()=>{
+        const cmb = document.querySelector('#cmbBebe')
+        const nome = document.querySelector('#edtNome')
+        const born = document.querySelector('#edtBorn')
+
+        if(cmb.value !='0'){
+            nome.value = cmb.options[cmb.selectedIndex].innerHTML
+            born.value = cmb.options[cmb.selectedIndex].born
+            if(cmb.options[cmb.selectedIndex].sexo=='1'){
+                document.querySelector('#masc').checked = true
+            }else{
+                document.querySelector('#fem').checked = true
+            }
+            const file = 'assets/bebes/'+localStorage.getItem('idUser')+'-'+cmb.value+'.jpg'
+            const back = backFunc({'filename':'../'+file},1)
+            back.then((resp)=>{
+                const imgExist = JSON.parse(resp)
+                if(imgExist){
+                    loadImg(file,'#cnvImg')
+                }else{
+                    loadImg('','#cnvImg')
+                }
+//                document.querySelector('#pic-perfil').src = imgExist ? `${file}?${new Date().getTime()}` : 'assets/default/user.jpeg'
+            })
+
+        }else{
+            nome.value = ''
+            born.value = ''
+            loadImg('','#cnvImg')
+            document.querySelector('#masc').checked = true
+        }
+
+
+
+    })
+
+    viewBebe()
+
+</script>

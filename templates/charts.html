@@ -1,0 +1,109 @@
+<title>Charts</title>
+<template>
+    <style>
+
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /*width: 100vw;*/
+            height: 100vh;
+        }
+
+    </style>
+
+    <div class="center">
+        <canvas id="myChart"></canvas>
+    </div>
+
+
+</template>
+<script>
+
+    fillChart()
+
+    const ctx = document.getElementById('myChart');
+
+    const data = {
+        labels: [],
+        datasets: []
+    };
+
+
+    const chart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: '28 Days Trainning'
+            }
+        }
+    }
+
+
+
+    });
+
+
+    function fillChart(){
+        const params = new Object;
+            params.id_user =  localStorage.getItem('idUser')
+
+        const myPromisse = queryDB(params,7)
+
+        myPromisse.then((resolve)=>{
+            const json = JSON.parse(resolve)
+            const td = new Date
+            td.change(-(21+td.getDay()))
+
+            const dados = new Object
+            dados.dia = []
+            dados.qtd = []
+            dados.label = []
+            dados.dataset = []
+            dados.id_modal = []
+
+            for(let i=0; i<28; i++){
+                const dia = td.getFormatDate()
+                dados.label.push(dia.substr(8,2)+'/'+dia.substr(5,2))
+                dados.dia.push(dia)
+                dados.qtd.push(0)
+                td.change(1)
+            }
+            
+            for(let i=0; i<json.length; i++){
+                const dia = dados.dia.indexOf(json[i].DIA) 
+                const id_modal = dados.id_modal.indexOf(json[i].ID_MODAL)
+                if(id_modal<0){
+                    dados.id_modal.push(json[i].ID_MODAL)
+                    const modal = new Object
+                    modal.label = json[i].nome
+                    modal.data = JSON.parse(JSON.stringify(dados.qtd))
+//                    modal.borderColor = 'red'
+                    modal.borderWidth = 1
+                    dados.dataset.push(modal)
+                    modal.data[dia] += parseInt(json[i].QTD) * parseInt(json[i].lance)
+                }else{
+                     dados.dataset[id_modal].data[dia] += parseInt(json[i].QTD) * parseInt(json[i].lance)
+                }
+                
+            }
+
+//            console.log(dados)
+            data.labels = dados.label
+            data.datasets = dados.dataset
+            chart.update();
+//            console.log(json)
+        })
+    }
+
+
+
+</script>

@@ -1,0 +1,47 @@
+ SELECT * FROM vw_chart;
+
+ DROP VIEW vw_chart;
+ CREATE VIEW vw_chart AS
+	SELECT  DOIT.id_owner AS ID_USER, DATE(DOIT.dia) AS DIA,MODAL.id AS ID_MODAL, MODAL.nome, COUNT(*) AS QTD, DOIT.lance
+	FROM tb_doit AS DOIT
+	INNER JOIN tb_my_modal AS MYMOD
+    INNER JOIN tb_modal AS MODAL    
+	ON DOIT.id_owner = MYMOD.id_user
+    AND DOIT.id_modal = MYMOD.id_modal
+    AND MODAL.id = MYMOD.id_modal
+    AND MODAL.id_user = MYMOD.id_user	
+	AND dia >= CURDATE() - INTERVAL 21 DAY - (IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0))
+	AND dia <= CURDATE() + (6 - IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0)) +1
+    AND DOIT.id_owner=1
+	GROUP BY MODAL.id, MODAL.id_user, DATE(DOIT.dia)
+    ORDER BY DOIT.dia ASC;
+ 
+ DROP VIEW vw_ranking;
+-- CREATE VIEW vw_ranking AS
+	SELECT USR.id, USR.nick,
+    (SELECT IFNULL(ROUND(AVG(saque),2),0)FROM tb_ranking WHERE id_avaliado=USR.id) AS SAQUE,
+    (SELECT IFNULL(ROUND(AVG(passe),2),0)FROM tb_ranking WHERE id_avaliado=USR.id) AS PASSE,
+    (SELECT IFNULL(ROUND(AVG(ataque),2),0)FROM tb_ranking WHERE id_avaliado=USR.id) AS ATAQUE,
+    (SELECT IFNULL(ROUND(AVG(levanta),2),0)FROM tb_ranking WHERE id_avaliado=USR.id) AS LEVANTA
+	FROM tb_usuario AS USR;
+        
+
+SELECT CURDATE() - INTERVAL 21 DAY - (IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0));
+
+SELECT CURDATE() + (6 - IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0));
+
+
+
+SELECT * FROM tb_doit WHERE id_modal=1 AND id_owner = 1 
+AND dia >= CURDATE() - INTERVAL 21 DAY - (IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0))
+AND dia <= CURDATE() + (6 - IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0))
+ORDER BY dia DESC;
+
+SELECT WEEKDAY('20231218');
+SELECT WEEKDAY(CURDATE());
+SELECT CURDATE() + 1;
+
+SELECT IF(WEEKDAY(CURDATE())+1<7, WEEKDAY(CURDATE())+1, 0);
+SELECT IF(WEEKDAY('20231217')+1<7, WEEKDAY('20231217')+1, 0);
+
+
