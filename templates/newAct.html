@@ -1,0 +1,51 @@
+<title>Adicionar Atividade</title>
+<template>
+    <style>
+
+        .center{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100px;
+            margin: 10px;
+        }
+
+        textarea{
+            padding: 10px;
+        }
+
+    </style>
+
+    <div class="center">
+        <div>
+            <label for="edtObs">Obs.</label>
+            <textarea id="edtObs" cols="30" rows="10" maxlength="255"></textarea>    
+        </div>
+        <button id="btnSaveAct" class="btn-backhand btn-fill">Salvar</button>
+    </div>
+
+
+</template>
+<script>
+
+    const data = mainData.newAct.data
+
+    document.querySelector('#btnSaveAct').addEventListener('click',()=>{
+        const params = new Object;
+            params.hash =  localStorage.getItem('hash')
+            params.id_bebe = data.id_bebe
+            params.id_modal =  data.id_modal
+            params.obs = document.querySelector('#edtObs').value.trim()
+
+        const myPromisse = queryDB(params,2)
+        myPromisse.then((resolve)=>{
+            mainData.perfil.func.getPerfil(data.id_modal)
+            closeModal(0)
+        })
+    })
+
+
+ 
+</script>

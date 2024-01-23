@@ -195,12 +195,6 @@ function calendar(){
     
     const td = new Date
     const hoje = td.getFormatDate()
-/*    
-    while(td.getDay()>0){
-        td.change(-1)
-    }                
-    td.change(-21)
-*/
     td.change(-(21+td.getDay()))
 
     for(let w=0; w<5; w++){
@@ -214,6 +208,15 @@ function calendar(){
             day.classList.add(w>0?'day-use':'day-name')
             td.getFormatDate() == hoje ? day.classList.add('today') : 0
             day.classList.add(w>0?'day-use':'day-name')
+
+            if(w>0){
+                day.addEventListener('click',()=>{
+                    openHTML('viewDay.html','modal',{'day':`${day.id}`},400)
+                })
+    
+            }
+
+
             w>0?td.change(1):0
             week.appendChild(day)
         }

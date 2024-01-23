@@ -80,6 +80,8 @@ DELIMITER $$
 	END $$
 DELIMITER ;
 
+CALL sp_view_do("f'lB9$rN`<'~l<$Z<9*~rBHT$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<-Z*xH9f6'T$rB3`0~N?l<",1,1);
+
 DROP PROCEDURE sp_viewModal;
 DELIMITER $$
 	CREATE PROCEDURE sp_viewModal(
@@ -100,6 +102,29 @@ DELIMITER $$
 				AND MYMOD.id_user = @id_call;
 			END IF;
         END IF;
+	END $$
+DELIMITER ;
+
+ DROP PROCEDURE sp_view_dia;
+DELIMITER $$
+	CREATE PROCEDURE sp_view_dia(
+		IN Ihash varchar(77),
+        IN Imodal int(11),
+        IN Ibebe int(11),
+        IN Idia date
+    )
+	BEGIN
+    
+		SET @id_call =  IFNULL((SELECT id FROM tb_usuario WHERE hash COLLATE utf8_general_ci = Ihash COLLATE utf8_general_ci LIMIT 1),0);
+
+		IF(@id_call > 0)THEN
+			SELECT * FROM tb_do WHERE id_modal=Imodal AND id_owner = @id_call AND id_bebe = Ibebe 
+				AND dia >= CONCAT(Idia, " 00:00:00")
+				AND dia <= CONCAT(Idia, " 23:59:59")
+				ORDER BY dia ASC;
+        
+        END IF;
+				
 	END $$
 DELIMITER ;
 

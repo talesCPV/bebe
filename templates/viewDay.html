@@ -1,0 +1,50 @@
+<title></title>
+<template>
+    <style>
+
+        .center{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+    </style>
+
+    <div class="center">
+        <h3 id="edtQtd"></h3>
+       <table id="tblAct"></table>
+
+
+    </div>
+
+
+</template>
+<script>
+
+    const modal = document.querySelector('#cmbHappen').options[document.querySelector('#cmbHappen').selectedIndex]
+    const icon = modal.getAttribute('icon')
+    
+    function fillDay(){
+        const params = new Object;
+            params.hash = localStorage.getItem('hash')
+            params.id_modal = modal.value
+            params.id_bebe = mainData.perfil.data.selBebe
+            params.dia = mainData.viewDay.data.day        
+
+        const myPromisse = queryDB(params,6);
+        myPromisse.then((resolve)=>{
+            const dia = JSON.parse(resolve)
+            document.querySelector('#edtQtd').innerHTML =  `<span class="mdi ${icon}"></span> : ${dia.length}`
+            const act = document.querySelector('#tblAct')
+            act.innerHTML = '<tr><th><span class="mdi mdi-clock-outline"></span></th><th>Obs.</th></tr>'
+            for(let i=0; i<dia.length; i++){
+                act.innerHTML += `<tr><td>${dia[i].dia.substr(11,5)}</td><td>${dia[i].obs}</td</tr>`
+            }
+        })
+    }
+
+    fillDay()
+
+</script>

@@ -183,7 +183,7 @@
                             const imgExist = JSON.parse(resp)   
                             document.querySelector('#pic-perfil').src = imgExist ? `${file}?${new Date().getTime()}` : 'assets/default/user.jpeg'
                         })
-                        getPerfil(document.querySelector('#cmbHappen').value)
+                        func.getPerfil(document.querySelector('#cmbHappen').value)
                     }
                 }
             }         
@@ -194,28 +194,12 @@
     document.querySelector('.myDate').appendChild(calendar())
 
     document.querySelector('#btn-doit').addEventListener('click',()=>{
-        const modal = document.querySelector('#cmbHappen').value
-        const modName = document.querySelector('#cmbHappen').options[document.querySelector('#cmbHappen').selectedIndex].innerHTML.trim()
-        if(modal.length>0){
-            if(confirm(`Confirma ${modName}?`)){
-                const params = new Object;
-                    params.hash =  localStorage.getItem('hash')
-                    params.id_bebe = data.selBebe
-                    params.id_modal =  modal
-                    params.obs = ''
 
-                    const myPromisse = queryDB(params,2)
-                    myPromisse.then((resolve)=>{
-//                        document.querySelector('.myDate').innerHTML = ''
-//                        document.querySelector('.myDate').appendChild(calendar())
-                        getPerfil(modal)
-                        console.log(resolve)
-                    })
+        const obj = new Object
+            obj.id_bebe = data.selBebe
+            obj.id_modal =  document.querySelector('#cmbHappen').value
 
-            }
-        }else{
-            alert('Nenhuma modalidade ativada. Vá em menu|config -> modalidades.')
-        }
+        openHTML('newAct.html','modal',obj,500)
 
     })
 
@@ -224,11 +208,11 @@
         const fill =  mainData.func.fillModal('#cmbMod',localStorage.getItem('hash'),0)
 
         fill.then((resolve)=>{            
-            getPerfil(document.querySelector('#cmbMod').value)
+            func.getPerfil(document.querySelector('#cmbMod').value)
         })
     }
 
-    function getPerfil(id_modal){
+    func.getPerfil = (id_modal)=>{
         const params = new Object;
         params.hash = localStorage.getItem('hash')
         params.id_modal = id_modal
@@ -278,7 +262,7 @@
         const opt = document.querySelector('#cmbHappen').options[document.querySelector('#cmbHappen').selectedIndex]
         document.querySelector('#btn-doit').innerHTML = `<span class="mdi ${opt.getAttribute('icon')}"></span>`
 
-        getPerfil(opt.value)
+        func.getPerfil(opt.value)
         
     })
 
